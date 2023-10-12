@@ -25,7 +25,8 @@ from random import randint
 
 random_url = f"https://api.fisenko.net/v1/quotes/en?query=string&offset={randint(0, 500)}&limit=1" # random quote
 random_json_urls.append(random_url)
-
+random_url = f"https://swapi.dev/api/planets/{randint(0, 60)}/?format=json" # random star wars planet
+random_json_urls.append(random_url)
 random_html_urls = [
     "https://loripsum.net/api/10/short/headers", # absolute gibberish html
     "https://api.fbi.gov/wanted/v1/list", # FBIs most wanted

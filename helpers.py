@@ -2,6 +2,8 @@ import requests
 from typing import Literal
 from constants import random_json_urls
 from random import choice
+import os
+import requests
 
 def hit_api(url, method:Literal["get", "post"]="get", return_type:Literal["json","content"]|None="json"):
     hit_method = requests.get if method == 'get' else requests.post
@@ -44,3 +46,15 @@ def iter_data(data, parent=""):
         yield parent, str(data)
 
 
+def get_user_avatar(user_name:str|None = None, save=True):
+    url = "https://robohash.org/<USERNAME>.png"
+    if not user_name:
+        user_name = os.getlogin()
+    new_url = url.replace("<USERNAME>", user_name)
+    response = requests.get(new_url).content
+    if save:
+        with open(user_name+'.png', 'wb') as fp:
+            fp.write(response)
+        return user_name+'.png'
+    else:
+        return response
