@@ -5,31 +5,46 @@ from random import choice
 import os
 import requests
 
-def hit_api(url, method:Literal["get", "post"]="get", return_type:Literal["json","content"]|None="json"):
-    hit_method = requests.get if method == 'get' else requests.post
-    return hit_method(url).json() if return_type == 'json' else hit_method(url).content.decode()
 
-def iter_dict(d:dict, parent=""):
+def hit_api(
+    url,
+    method: Literal["get", "post"] = "get",
+    return_type: Literal["json", "content"] | None = "json",
+    ):
+    hit_method = requests.get if method == "get" else requests.post
+    return (
+        hit_method(url).json()
+        if return_type == "json"
+        else hit_method(url).content.decode()
+    )
+
+
+def iter_dict(d: dict, parent=""):
     for dict_key, dict_value in d.items():
         if isinstance(dict_value, dict):
-            for dict_parent, dict_data in iter_dict(dict_value, parent=parent+'.'+dict_key):
+            for dict_parent, dict_data in iter_dict(
+                dict_value, parent=parent + "." + dict_key
+            ):
                 yield dict_parent, dict_data
         elif isinstance(dict_value, list):
-            for list_parent, list_data in iter_list(dict_value, parent=parent+'.'+dict_key):
+            for list_parent, list_data in iter_list(
+                dict_value, parent=parent + "." + dict_key
+            ):
                 yield list_parent, list_data
         else:
-            yield parent+'.'+dict_key, str(dict_value)
+            yield parent + "." + dict_key, str(dict_value)
 
-def iter_list(l:list, parent=""):
+
+def iter_list(l: list, parent=""):
     for list_data in l:
         if isinstance(list_data, dict):
-            for dict_parent, dict_data in iter_dict(list_data, parent=parent+"L"):
+            for dict_parent, dict_data in iter_dict(list_data, parent=parent + "L"):
                 yield dict_parent, dict_data
 
         elif isinstance(list_data, list):
-            for list_parent, list_data2 in iter_list(list_data, parent=parent+"L"):
+            for list_parent, list_data2 in iter_list(list_data, parent=parent + "L"):
                 yield list_parent, list_data2
-        
+
         else:
             yield parent, str(list_data)
 
@@ -40,21 +55,21 @@ def iter_data(data, parent=""):
             yield dict_parent, dict_data
 
     elif isinstance(data, list):
-        for list_parent, list_data in iter_list(data, parent=parent+'-'):
+        for list_parent, list_data in iter_list(data, parent=parent + "-"):
             yield list_parent, list_data
     else:
         yield parent, str(data)
 
 
-def get_user_avatar(user_name:str|None = None, save=True):
+def get_user_avatar(user_name: str | None = None, save=True):
     url = "https://robohash.org/<USERNAME>.png"
     if not user_name:
         user_name = os.getlogin()
     new_url = url.replace("<USERNAME>", user_name)
     response = requests.get(new_url).content
     if save:
-        with open(user_name+'.png', 'wb') as fp:
+        with open(user_name + ".png", "wb") as fp:
             fp.write(response)
-        return user_name+'.png'
+        return user_name + ".png"
     else:
         return response
